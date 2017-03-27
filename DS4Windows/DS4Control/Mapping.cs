@@ -92,6 +92,9 @@ namespace DS4Windows
         public static int prevmouseaccel = 0;
         private static double horizontalRemainder = 0.0, verticalRemainder = 0.0;
 
+        private static String lastActionName = "";
+        private static bool isL1Down = false;
+
         public static void Commit(int device)
         {
             SyntheticState state = deviceState[device];
@@ -1121,6 +1124,22 @@ namespace DS4Windows
                                 }
                             }
                             if (action.pressRelease) utriggeractivated = !utriggeractivated;
+                        }
+
+                        if (!lastActionName.Equals(actionname))
+                        {
+                            lastActionName = actionname;
+                            //System.Diagnostics.Debug.WriteLine(actionname);
+                        }
+
+                        if (cState.L1 && !isL1Down)
+                        {
+                            isL1Down = true;
+                            LoadTempProfile(device, "AirRollDead", true, ctrl);
+                        } else if (!cState.L1 && isL1Down)
+                        {
+                            LoadProfile(device, false, ctrl);
+                            isL1Down = false;
                         }
 
                         if (triggeractivated && action.type == "Program")
